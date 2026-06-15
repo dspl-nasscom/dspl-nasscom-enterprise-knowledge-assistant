@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.pyo
+.vscode
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets — never commit
+.env
+
+# Data (bulk files)
+data/raw/
+data/vector_store/
+data/benchmarks/
+*.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Mypy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# Docker
+docker/volumes/
+
+# Logs
+*.log
+logs/
+
+.tool-versions

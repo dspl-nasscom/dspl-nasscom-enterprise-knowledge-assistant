@@ -1,0 +1,71 @@
+services:
+  # ── FastAPI + Gunicorn API ─────────────────────────────────────────────────
+  api:
+    build:
+      context: ..
+      dockerfile: ../Dockerfile
+    container_name: gemini_api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      - ../.env
+    environment:
+      - HF_HOME=/app/data/huggingface
+      - QDRANT_URL=http://qdrant:6333
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-copilot}
+    volumes:
+      # Persist vector store across container restarts
+      - gemini_vector_store:/app/data/vector_store
+      - gemini_db:/app/data
+      - gemini_hf_cache:/app/data/huggingface
+      # Mount raw data for ingest (read-only)
+      - ../data/raw:/app/data/raw:ro
+    depends_on:
+      qdrant:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/livez"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s   # reduced since models will be cached
+
+  # ── PostgreSQL ────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-copilot}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Qdrant ────────────────────────────────────────────────────────────────
+  qdrant:
+    image: qdrant/qdrant:v1.11.0
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+volumes:
+  gemini_vector_store:
+  gemini_db:
+  postgres_data:
+  gemini_hf_cache:
+  qdrant_data:

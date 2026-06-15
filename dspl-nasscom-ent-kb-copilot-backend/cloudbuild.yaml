@@ -1,0 +1,66 @@
+steps:
+  # ── Step 1: Build container image ────────────────────────────────────────────
+  # stage can authenticate with HuggingFace and avoid rate-limiting.
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - build
+      - "--build-arg"
+      - "HF_TOKEN=${_HF_TOKEN}"
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/${_DEVOPS_PROJECT_ID}/${_REPO_NAME}-${_ENV_TYPE}/${_SERVICE_NAME}-${_ENV_TYPE}:latest"
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/${_DEVOPS_PROJECT_ID}/${_REPO_NAME}-${_ENV_TYPE}/${_SERVICE_NAME}-${_ENV_TYPE}:$SHORT_SHA"
+      - "-f"
+      - "Dockerfile"
+      - "."
+
+  # ── Step 2: Push :latest ──────────────────────────────────────────────────────
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - push
+      - "${_REGION}-docker.pkg.dev/${_DEVOPS_PROJECT_ID}/${_REPO_NAME}-${_ENV_TYPE}/${_SERVICE_NAME}-${_ENV_TYPE}:latest"
+
+  # ── Step 3: Push :$SHORT_SHA ──────────────────────────────────────────────────
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - push
+      - "${_REGION}-docker.pkg.dev/${_DEVOPS_PROJECT_ID}/${_REPO_NAME}-${_ENV_TYPE}/${_SERVICE_NAME}-${_ENV_TYPE}:$SHORT_SHA"
+
+  # ── Step 4: Deploy to Cloud Run ───────────────────────────────────────────────
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - "${_SERVICE_NAME}-${_ENV_TYPE}"
+      - "--image"
+      - "${_REGION}-docker.pkg.dev/${_DEVOPS_PROJECT_ID}/${_REPO_NAME}-${_ENV_TYPE}/${_SERVICE_NAME}-${_ENV_TYPE}:$SHORT_SHA"
+      - "--allow-unauthenticated"
+      - "--service-account"
+      - "${_PROJECT_NO}-compute@developer.gserviceaccount.com"
+      - "--timeout"
+      - "300"
+      - "--memory"
+      - "${_MEMORY_CONF}"
+      - "--cpu"
+      - "${_CPU_CONF}"
+      - "--concurrency"
+      - "${_CONCURRENCY_CONF}"
+      - "--min-instances"
+      - "${_MIN_INSTANCE_CONF}"
+      - "--max-instances"
+      - "${_MAX_INSTANCE_CONF}"
+      - "--execution-environment"
+      - "gen2"
+      - "--vpc-connector"
+      - "projects/${_PROJECT_ID}/locations/${_REGION}/connectors/${_VPC_CONNECTOR}"
+      - "--vpc-egress"
+      - "private-ranges-only"
+      - "--region"
+      - "${_REGION}"
+      - "--project"
+      - "${_PROJECT_ID}"
+      - "--set-secrets"
+      - "GEMINI_API_KEY=gemini-api-key:latest"
+      - "--set-env-vars"
+      - "^#^APP_ENV=${_APP_ENV}#LOG_LEVEL=${_LOG_LEVEL}#PORT=8080#LLM_PROVIDER=gemini#LLM_MODEL=${_LLM_MODEL}#EMBEDDING_MODEL=${_EMBEDDING_MODEL}#RERANKER_MODEL=${_RERANKER_MODEL}#HF_HOME=/app/data/huggingface#TRANSFORMERS_OFFLINE=1#TOKENIZERS_PARALLELISM=false#TOP_K_RETRIEVE=${_TOP_K_RETRIEVE}#TOP_N_RERANK=${_TOP_N_RERANK}#CONFIDENCE_THRESHOLD=${_CONFIDENCE_THRESHOLD}#QDRANT_URL=${_QDRANT_URL}#QDRANT_COLLECTION=${_QDRANT_COLLECTION}#GCS_BUCKET_NAME=${_GCS_BUCKET_NAME}#FIRESTORE_PROJECT=${_PROJECT_ID}#CORS_ORIGINS=${_CORS_ORIGINS}"

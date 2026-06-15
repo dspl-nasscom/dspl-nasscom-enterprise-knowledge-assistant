@@ -1,0 +1,80 @@
+/* ─── Global Reset & Base ─────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: #F4F6FB;
+}
+
+/* ─── CSS Variables ──────────────────────────────────────────────────────────*/
+:root {
+  --gradient-primary: linear-gradient(135deg, #0A3DA6 0%, #4c86ff 100%);
+  --gradient-primary-hover: linear-gradient(135deg, #0d4ed2 0%, #5a90ff 100%);
+  --gradient-subtle: linear-gradient(135deg, rgba(10,61,166,0.06) 0%, rgba(76,134,255,0.06) 100%);
+  --shadow-card: 0px 1px 3px rgba(30,41,59,0.06), 0px 4px 16px rgba(30,41,59,0.04);
+  --shadow-card-hover: 0px 6px 24px rgba(13,78,210,0.10), 0px 1px 4px rgba(30,41,59,0.06);
+  --shadow-dropdown: 0px 8px 32px rgba(30,41,59,0.12), 0px 2px 8px rgba(30,41,59,0.06);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 100px;
+}
+
+/* ─── Gradient Text Utility ──────────────────────────────────────────────────*/
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Smooth Color Transitions ──────────────────────────────────────────────*/
+a,
+button,
+input,
+select,
+textarea,
+[class*="MuiButton"],
+[class*="MuiCard"],
+[class*="MuiChip"],
+[class*="MuiIconButton"] {
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* ─── Scrollbar (Non-webkit fallback is set in theme) ───────────────────────*/
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #D1DAE8;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #8FA3BF;
+}
+
+/* ─── Focus Ring ─────────────────────────────────────────────────────────────*/
+:focus-visible {
+  outline: 2px solid rgba(13, 78, 210, 0.5);
+  outline-offset: 2px;
+}
+
+/* ─── Selection ──────────────────────────────────────────────────────────────*/
+::selection {
+  background-color: rgba(13, 78, 210, 0.15);
+  color: #0A3DA6;
+}

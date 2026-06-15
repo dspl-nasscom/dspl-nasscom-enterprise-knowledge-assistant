@@ -1,0 +1,31 @@
+# Git
+.git
+.gitignore
+
+# Python artifacts
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment files — secrets must never go into the image
+.env
+.env.*
+
+# Local data — not needed in the container (ingested via API at runtime)
+data/
+
+# Build/dev tooling
+docker/
+docs/
+tests/
+scratch/
+README.md
+Makefile
+.tool-versions
+.vscode/
+
+# Poetry lockfile is needed for reproducible builds — do NOT ignore it
+# poetry.lock  ← keep this

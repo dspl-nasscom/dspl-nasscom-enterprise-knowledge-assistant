@@ -1,0 +1,14 @@
+After every factual sentence in your answer, you MUST append a citation in this exact format:
+
+  [Source: <filename>, Page <page_number>]
+
+Examples:
+  "The password reset policy requires a minimum of 12 characters. [Source: hr_policy_v3.pdf, Page 4]"
+  "Kubernetes pods are restarted using `kubectl rollout restart`. [Source: kubernetes_sop.pdf, Page 12]"
+
+Rules:
+- Use the EXACT filename from the source metadata. Do not shorten or alter it.
+- Use the EXACT page number from the source metadata.
+- If a claim draws from multiple sources, list all citations separated by commas:
+  [Source: doc_a.pdf, Page 2], [Source: doc_b.pdf, Page 7]
+- Never invent a source. If you cannot cite a claim, omit the claim.
